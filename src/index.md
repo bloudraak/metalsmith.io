@@ -2,148 +2,81 @@
 template: index.html
 ---
 
+## Getting Started
+
+1. Install NodeJS
+1. Create a directory
+
+  ``` bash
+  mkdir website
+  cd website
+  ```
+
+2. Install Metalsmith and dependencies
+
+  ```bash
+  npm install metalsmith
+  npm install metalsmith-markdown
+  ```
+
+3. Create a build.js
+
+  ```js
+  var Metalsmith   = require('metalsmith');
+  var markdown     = require('metalsmith-markdown');
+  Metalsmith(__dirname)
+    .use(markdown())
+    .destination('./build')
+    .build(function(err, files) {
+      if (err) { throw err; }
+    });
+  ```
+
+4. Create a "src" directory
+
+  ```bash
+  mkdir src
+  cd src
+  ```
+5. Create your first page (index.md)
+
+  ```markdown
+  ---
+  title: Home Page
+  template: site.html
+  ---
+
+  # Home Page
+
+  This is a your first page
+
+  ```
+
+6. Create your first template
+
+  Create a directory for a template
+
+  ```bash
+    cd..
+    mkdir templates
+    cd templates
+  ```
+
+  Create a file `site.html`
+
+  ```html
+  <html>
+  <head>
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description }}">
+  </head>
+  <body>
+    <h1>{{ title }}</h1>
+    <p>{{ description }}</p>
+    {{ content | safe }}
+  </body>
+  </html>
+  ```
 
 ---
-
-
-# Everything is a Plugin
-
-All of the logic in Metalsmith is handled by plugins. You simply chain them together. Here's what the simplest blog looks like...
-
-<pre><code><b>Metalsmith</b>(__dirname)
-  .use(<b>markdown()</b>)
-  .use(<b>layouts</b>(<i>'handlebars'</i>))
-  .build(function(err) {
-    if (err) throw err;
-  });
-</code></pre>
-
-...but what if you want to get fancier by hiding your unfinished drafts and using custom permalinks? Just add plugins...
-
-<pre><code><b>Metalsmith</b>(__dirname)
-  .use(<b>drafts()</b>)
-  .use(markdown())
-  .use(<b>permalinks</b>(<i>'posts/:title'</i>))
-  .use(layouts(<i>'handlebars'</i>))
-  .build(function(err) {
-    if (err) throw err;
-  });
-</code></pre>
-
-...it's as easy as that!
-
-
----
-
-
-# How does it work?
-
-Metalsmith works in three simple steps:
-
-  1. Read all the files in a source directory.
-  2. Invoke a series of plugins that manipulate the files.
-  3. Write the results to a destination directory!
-
-Each plugin is invoked with the contents of the source directory, with every file parsed for optional YAML front-matter, like so...
-
-<pre><code>---
-<b>title</b>: A Catchy Title
-<b>draft</b>: true
----
-
-An unfinished article...
-</code></pre>
-
-<pre><code>{
-  <i>'path/to/my-file.md'</i>: {
-    title: <i>'A Catchy Title'</i>,
-    draft: <b>true</b>,
-    contents: <b>new</b> Buffer(<i>'An unfinished article...'</i>)
-  }
-}
-</code></pre>
-
-The plugins can manipulate the files however they want, and writing one is super simple. Here's the code for the drafts plugin from above:
-
-<pre><code><b>function</b>(){
-  <b>return function</b> <i>drafts</i>(files, metalsmith, done){
-    <b>for</b> (<b>var</b> file <b>in</b> files) {
-      <b>if</b> (files[file].draft) <b>delete</b> files[file];
-    }
-    done();
-  };
-}
-</code></pre>
-
-Of course they can get a lot more complicated too. That's what makes Metalsmith powerful; the plugins can do anything you want.
-
-<i><b>Note:</b> The order the plugins are invoked is the order they are in the build script or the metalsmith.json file for cli implementations.  This is important for using a plugin that requires a plugins output to work.</i>
-
----
-
-
-# Install it
-
-Metalsmith and its plugins can be installed with npm:
-
-<pre><code>$ <b>npm</b> install <i>metalsmith</i></code></pre>
-
-The package exposes both a [Javascript API](https://github.com/segmentio/metalsmith#api), and [CLI](https://github.com/segmentio/metalsmith#cli) in case you're used to that type of workflow from other static site generators. To see how they're used check out the [examples](https://github.com/segmentio/metalsmith/tree/master/examples).
-
-
----
-
-
-# A Little Secret
-
-We keep referring to Metalsmith as a "static site generator", but it's a lot more than that. Since everything is a plugin, the core library is actually just an abstraction for manipulating a directory of files.
-
-Which means you could just as easily use it to make...
-
-<ul class="Example-list">
-{% for example in examples %}
-  <li class="Example">
-    <h1 class="Example-title">{{ example.name }}</h1>
-    <ol class="Example-step-list">
-    {% for step in example.steps %}
-      <li class="Example-step ss-{{ step.icon }}">{{ step.text }}</li>
-    {% endfor %}
-    </ol>
-  </li>
-{% endfor %}
-</ul>
-
-The plugins are all reusable. That PDF generator plugin for eBooks? Use it to generate PDFs for each of your blog posts too!
-
-Check out [the code examples](https://github.com/segmentio/metalsmith/tree/master/examples) to get an idea for what's possible.
-
-
----
-
-
-# The Plugins
-The core Metalsmith library doesn't bundle any plugins by default. You just require new ones as needed, or make your own!
-
-Here's a list of the current plugins:
-
-<label class="Plugin-filter">
-  <i class="Plugin-filter-icon ss-search"></i>
-  <input class="Plugin-filter-input" placeholder="Filter plugins…" />
-</label>
-
-<ul class="Plugin-list">
-{% for plugin in plugins %}
-  <li class="Plugin">
-    <a class="Plugin-link" href="{{ plugin.repository }}">
-      <h1 class="Plugin-title">{{ plugin.name }}<i class="Plugin-icon ss-{{ plugin.icon }}"></i></h1>
-      <i class="Plugin-arrow ss-right"></i>
-      <p class="Plugin-description">{{ plugin.description }}</p>
-    </a>
-  </li>
-{% endfor %}
-</ul>
-
-If you write your own plugin, submit a pull request to the [metalsmith.io](https://github.com/segmentio/metalsmith.io/tree/master/src/plugins.json) repository and it will show up here!
-
-
 ---
