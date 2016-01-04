@@ -4,7 +4,14 @@ template: index.html
 
 ## Getting Started
 
-1. Install NodeJS
+Metalsmith was written using [NodeJS](https://nodejs.org/en/). You can verify whether you have NodeJS installed by typing the following into a terminal window (or command prompt if you use Microsoft Windows).
+
+	node --version
+	npm --version
+
+If the version being printed exceeds v4.0.0, then we’re in business, otherwise follow the instructions in the [NodeJS](https://nodejs.org/en/) site and install Node. We’ll be waiting for you.
+
+
 1. Create a directory
 
   ``` bash
@@ -15,21 +22,27 @@ template: index.html
 2. Install Metalsmith and dependencies
 
   ```bash
-  npm install metalsmith
-  npm install metalsmith-markdown
+	npm init
+  npm install --save metalsmith
+  npm install --save metalsmith-markdown
+  npm install --save metalsmith-layouts
+	npm install --save handlebars
   ```
 
-3. Create a build.js
+3. Create a index.js
 
-  ```js
-  var Metalsmith   = require('metalsmith');
-  var markdown     = require('metalsmith-markdown');
-  Metalsmith(__dirname)
-    .use(markdown())
-    .destination('./build')
-    .build(function(err, files) {
-      if (err) { throw err; }
-    });
+```js
+var Metalsmith   = require('metalsmith');
+var markdown     = require('metalsmith-markdown');
+var layouts      = require('metalsmith-layouts')
+
+Metalsmith(__dirname)
+  .use(markdown())
+  .use(layouts('handlebars'))
+  .destination('./build')
+  .build(function(err, files) {
+    if (err) { throw err; }
+  });
   ```
 
 4. Create a "src" directory
@@ -43,7 +56,7 @@ template: index.html
   ```markdown
   ---
   title: Home Page
-  template: site.html
+  layouts: site.html
   ---
 
   # Home Page
@@ -54,12 +67,12 @@ template: index.html
 
 6. Create your first template
 
-  Create a directory for a template
+  Create a directory for a layouts
 
   ```bash
     cd..
-    mkdir templates
-    cd templates
+    mkdir layouts
+    cd layouts
   ```
 
   Create a file `site.html`
@@ -73,10 +86,16 @@ template: index.html
   <body>
     <h1>{{ title }}</h1>
     <p>{{ description }}</p>
-    {{ content | safe }}
+    {{ content }}
   </body>
   </html>
   ```
+
+7. Build your website
+
+	node index.js
+
+
 
 ---
 ---
